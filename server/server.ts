@@ -1,6 +1,7 @@
 import express from "express";
 import pg from "pg";
 import dotenv from "dotenv";
+import { Task } from "./types/taskType";
 
 const { Client } = pg;
 dotenv.config();
@@ -20,7 +21,7 @@ const port = 3000;
 db.connect();
 
 app.get("/", async (req, res) => {
-  const result = await db.query("SELECT * FROM task");
+  const result = await db.query<Task>("SELECT * FROM task");
   console.log(result.rows);
   res.send(result.rows[0].title);
 });
