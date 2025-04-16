@@ -1,6 +1,7 @@
 import express from "express";
 import pg from "pg";
 import dotenv from "dotenv";
+import cors from "cors";
 import { Task } from "./types/taskType";
 
 const { Client } = pg;
@@ -17,13 +18,23 @@ const db = new Client({
 const app = express();
 
 const port = 3000;
-
+const corsOptions = {
+  origin: ["http://localhost:5173"],
+};
 db.connect();
-
+app.use(express.json());
+app.use(cors(corsOptions));
 app.get("/", async (req, res) => {
   const result = await db.query<Task>("SELECT * FROM task");
   console.log(result.rows);
   res.send(result.rows[0].title);
+});
+
+app.post("/add", (req, res) => {
+  if (req.body) {
+    console.log(req.body);
+  }
+  res.json({ message: `is this ur values? ${req.body.task}` });
 });
 
 app.listen(port, () => {

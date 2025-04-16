@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import express from "express";
 import pg from "pg";
 import dotenv from "dotenv";
+import cors from "cors";
 const { Client } = pg;
 dotenv.config();
 const db = new Client({
@@ -21,12 +22,23 @@ const db = new Client({
 });
 const app = express();
 const port = 3000;
+const corsOptions = {
+    origin: ["http://localhost:5173"],
+};
 db.connect();
+app.use(express.json());
+app.use(cors(corsOptions));
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield db.query("SELECT * FROM task");
     console.log(result.rows);
     res.send(result.rows[0].title);
 }));
+app.post("/add", (req, res) => {
+    if (req.body) {
+        console.log(req.body);
+    }
+    res.json({ message: `is this ur values? ${req.body.task}` });
+});
 app.listen(port, () => {
     console.log(`Server is up and running on port ${port}`);
 });
