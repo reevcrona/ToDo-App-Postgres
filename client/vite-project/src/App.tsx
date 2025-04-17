@@ -5,7 +5,7 @@ function App() {
   const [taskInput, setTaskInput] = useState("");
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTaskInput((prevState) => (prevState = e.target.value));
+    setTaskInput(e.target.value);
   };
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {

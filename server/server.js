@@ -28,17 +28,28 @@ const corsOptions = {
 db.connect();
 app.use(express.json());
 app.use(cors(corsOptions));
+const getAllTasks = () => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield db.query("SELECT * FROM task");
+    return response.rows;
+});
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield db.query("SELECT * FROM task");
     console.log(result.rows);
     res.send(result.rows[0].title);
 }));
-app.post("/add", (req, res) => {
-    if (req.body) {
-        console.log(req.body);
+app.post("/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield db.query("INSERT INTO task(title) VALUES($1)", [req.body.task]);
+        const tasks = yield getAllTasks();
+        res
+            .status(200)
+            .json({ message: "Task was succesfully added", tasks: tasks });
     }
-    res.json({ message: `is this ur values? ${req.body.task}` });
-});
+    catch (error) {
+        console.error("Failed to add task", error);
+        console.log(req.body.task, "TASK FROM INPUT");
+    }
+}));
 app.listen(port, () => {
     console.log(`Server is up and running on port ${port}`);
 });

@@ -24,17 +24,29 @@ const corsOptions = {
 db.connect();
 app.use(express.json());
 app.use(cors(corsOptions));
+
+const getAllTasks = async () => {
+  const response = await db.query("SELECT * FROM task");
+  return response.rows;
+};
+
 app.get("/", async (req, res) => {
   const result = await db.query<Task>("SELECT * FROM task");
   console.log(result.rows);
   res.send(result.rows[0].title);
 });
 
-app.post("/add", (req, res) => {
-  if (req.body) {
-    console.log(req.body);
+app.post("/add", async (req, res) => {
+  try {
+    await db.query("INSERT INTO task(title) VALUES($1)", [req.body.task]);
+    const tasks = await getAllTasks();
+    res
+      .status(200)
+      .json({ message: "Task was succesfully added", tasks: tasks });
+  } catch (error) {
+    console.error("Failed to add task", error);
+    console.log(req.body.task, "TASK FROM INPUT");
   }
-  res.json({ message: `is this ur values? ${req.body.task}` });
 });
 
 app.listen(port, () => {
