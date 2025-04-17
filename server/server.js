@@ -33,9 +33,15 @@ const getAllTasks = () => __awaiter(void 0, void 0, void 0, function* () {
     return response.rows;
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield db.query("SELECT * FROM task");
-    console.log(result.rows);
-    res.send(result.rows[0].title);
+    try {
+        const result = yield getAllTasks();
+        res
+            .status(200)
+            .json({ message: "Sucessfully fetched tasks", tasks: result });
+    }
+    catch (error) {
+        console.error("Failed to retrive tasks", error);
+    }
 }));
 app.post("/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

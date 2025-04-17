@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import Task from "./components/Task";
 import axios from "axios";
+import { TasksDataType } from "./types/tasksDataType";
 
 function App() {
   const [taskInput, setTaskInput] = useState("");
+  const [taskData, setTaskData] = useState<TasksDataType[]>([]);
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTaskInput(e.target.value);
@@ -14,15 +17,21 @@ function App() {
     console.log("This is the form data", formData);
     try {
       const response = await axios.post("http://localhost:3000/add", formData);
-      console.log(response.data);
+      console.log(response.data.tasks);
+      setTaskData(response.data.tasks);
     } catch (error) {
       console.error("Failed adding new task", error);
     }
   };
 
+  const fetchTasks = async () => {
+    const response = await axios.get("http://localhost:3000");
+    setTaskData(response.data.tasks);
+  };
+
   useEffect(() => {
-    console.log(taskInput);
-  }, [taskInput]);
+    fetchTasks();
+  }, [taskData]);
 
   return (
     <div className=" w-full h-full flex items-center justify-center">
@@ -48,6 +57,12 @@ function App() {
             Add
           </button>
         </form>
+        <div className="flex justify-center flex-col items-center mt-5">
+          {taskData.length > 0 &&
+            taskData.map((task, index) => (
+              <Task key={index} title={task.title} />
+            ))}
+        </div>
       </div>
     </div>
   );

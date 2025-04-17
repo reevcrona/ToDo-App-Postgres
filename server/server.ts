@@ -31,9 +31,14 @@ const getAllTasks = async () => {
 };
 
 app.get("/", async (req, res) => {
-  const result = await db.query<Task>("SELECT * FROM task");
-  console.log(result.rows);
-  res.send(result.rows[0].title);
+  try {
+    const result = await getAllTasks();
+    res
+      .status(200)
+      .json({ message: "Sucessfully fetched tasks", tasks: result });
+  } catch (error) {
+    console.error("Failed to retrive tasks", error);
+  }
 });
 
 app.post("/add", async (req, res) => {
