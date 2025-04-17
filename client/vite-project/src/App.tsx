@@ -7,8 +7,11 @@ function App() {
   const [taskInput, setTaskInput] = useState("");
   const [taskData, setTaskData] = useState<TasksDataType[]>([]);
 
-  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTaskInput(e.target.value);
+  const onChangeHandler = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    stateHandler: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    stateHandler(e.target.value);
   };
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,6 +33,13 @@ function App() {
     setTaskData(response.data.tasks);
   };
 
+  const updateTask = async (taskId: number, taskText: string) => {
+    const response = await axios.put("http://localhost:3000/update", {
+      data: { taskId: taskId, taskText: taskText },
+    });
+    setTaskData(response.data.tasks);
+  };
+
   const deleteTask = async (taskId: number) => {
     const response = await axios.delete("http://localhost:3000/delete", {
       data: { taskId: taskId },
@@ -39,7 +49,7 @@ function App() {
 
   useEffect(() => {
     fetchTasks();
-  }, [taskData]);
+  }, []);
 
   return (
     <div className=" w-full h-full flex items-center justify-center">
@@ -56,7 +66,7 @@ function App() {
             placeholder="Add Task"
             value={taskInput}
             className="bg-white pl-1.5 py-1.5"
-            onChange={(e) => onChangeHandler(e)}
+            onChange={(e) => onChangeHandler(e, setTaskInput)}
           />
           <button
             type="submit"
@@ -67,12 +77,14 @@ function App() {
         </form>
         <div className="flex justify-center flex-col items-center mt-5">
           {taskData.length > 0 &&
-            taskData.map((task, index) => (
+            taskData.map((task) => (
               <Task
-                key={index}
+                key={task.id}
                 title={task.title}
                 id={task.id}
                 deleteTask={deleteTask}
+                onChangeHandler={onChangeHandler}
+                updateTask={updateTask}
               />
             ))}
         </div>

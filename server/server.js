@@ -29,7 +29,7 @@ db.connect();
 app.use(express.json());
 app.use(cors(corsOptions));
 const getAllTasks = () => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield db.query("SELECT * FROM task");
+    const response = yield db.query("SELECT * FROM task ORDER BY id DESC");
     return response.rows;
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -55,6 +55,13 @@ app.post("/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.error("Failed to add task", error);
         console.log(req.body.task, "TASK FROM INPUT");
     }
+}));
+app.put("/update", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { taskId, taskText } = req.body.data;
+    console.log(taskId, taskText);
+    yield db.query("UPDATE task SET title=$1 WHERE id=$2", [taskText, taskId]);
+    const tasks = yield getAllTasks();
+    res.status(200).json({ message: "Updated task successfully", tasks: tasks });
 }));
 app.delete("/delete", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 const getAllTasks = async () => {
-  const response = await db.query("SELECT * FROM task");
+  const response = await db.query("SELECT * FROM task ORDER BY id DESC");
   return response.rows;
 };
 
@@ -52,6 +52,15 @@ app.post("/add", async (req, res) => {
     console.error("Failed to add task", error);
     console.log(req.body.task, "TASK FROM INPUT");
   }
+});
+
+app.put("/update", async (req, res) => {
+  const { taskId, taskText } = req.body.data;
+
+  console.log(taskId, taskText);
+  await db.query("UPDATE task SET title=$1 WHERE id=$2", [taskText, taskId]);
+  const tasks = await getAllTasks();
+  res.status(200).json({ message: "Updated task successfully", tasks: tasks });
 });
 
 app.delete("/delete", async (req, res) => {
