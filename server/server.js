@@ -56,6 +56,18 @@ app.post("/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(req.body.task, "TASK FROM INPUT");
     }
 }));
+app.delete("/delete", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield db.query("DELETE FROM task WHERE id=$1", [req.body.taskId]);
+        const tasks = yield getAllTasks();
+        res
+            .status(200)
+            .json({ message: "Task was successfully deleted", tasks: tasks });
+    }
+    catch (error) {
+        console.error("Could not find task to delete", error);
+    }
+}));
 app.listen(port, () => {
     console.log(`Server is up and running on port ${port}`);
 });

@@ -19,6 +19,7 @@ function App() {
       const response = await axios.post("http://localhost:3000/add", formData);
       console.log(response.data.tasks);
       setTaskData(response.data.tasks);
+      setTaskInput("");
     } catch (error) {
       console.error("Failed adding new task", error);
     }
@@ -26,6 +27,13 @@ function App() {
 
   const fetchTasks = async () => {
     const response = await axios.get("http://localhost:3000");
+    setTaskData(response.data.tasks);
+  };
+
+  const deleteTask = async (taskId: number) => {
+    const response = await axios.delete("http://localhost:3000/delete", {
+      data: { taskId: taskId },
+    });
     setTaskData(response.data.tasks);
   };
 
@@ -60,7 +68,12 @@ function App() {
         <div className="flex justify-center flex-col items-center mt-5">
           {taskData.length > 0 &&
             taskData.map((task, index) => (
-              <Task key={index} title={task.title} />
+              <Task
+                key={index}
+                title={task.title}
+                id={task.id}
+                deleteTask={deleteTask}
+              />
             ))}
         </div>
       </div>

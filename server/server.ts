@@ -54,6 +54,18 @@ app.post("/add", async (req, res) => {
   }
 });
 
+app.delete("/delete", async (req, res) => {
+  try {
+    await db.query("DELETE FROM task WHERE id=$1", [req.body.taskId]);
+    const tasks = await getAllTasks();
+    res
+      .status(200)
+      .json({ message: "Task was successfully deleted", tasks: tasks });
+  } catch (error) {
+    console.error("Could not find task to delete", error);
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
 });
